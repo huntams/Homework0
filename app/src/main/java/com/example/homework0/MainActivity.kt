@@ -3,6 +3,7 @@ package com.example.homework0
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -10,48 +11,49 @@ import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
-    fun toastShow(name: String) {
+    private fun showToast(name: String) {
+
         Toast.makeText(applicationContext, "Поле $name пустое", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showSnackbar(it: View, info: String) {
+        Snackbar.make(it, info, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val buttonAdd = findViewById<Button>(R.id.ButtonAdd)
-        val buttonRemove = findViewById<Button>(R.id.ButtonRemove)
-        val editName = findViewById<EditText>(R.id.editTextName)
-        val editLastName = findViewById<EditText>(R.id.editTextLastName)
-        val editAge = findViewById<EditText>(R.id.editTextAge)
+        val buttonAdd = findViewById<Button>(R.id.buttonAdd)
+        val buttonRemove = findViewById<Button>(R.id.buttonRemove)
+        val logic = Logic(
+            findViewById<EditText>(R.id.editTextName),
+            findViewById<EditText>(R.id.editTextLastName),
+            findViewById<EditText>(R.id.editTextAge)
+        )
         val textView = findViewById<TextView>(R.id.textView)
-        val lines = arrayListOf<String>()
-        textView.movementMethod = ScrollingMovementMethod()
         buttonAdd.setOnClickListener {
-            if (lines.size + 1 == 10)
-                Snackbar.make(it, "Список заполнен", Snackbar.LENGTH_SHORT).show()
+            if (logic.lines.size == 10)
+                showSnackbar(it, "Список заполнен")
             else {
                 when {
-                    editName.text.isEmpty() -> toastShow(editName.hint.toString())
-                    editLastName.text.isEmpty() -> toastShow(editLastName.hint.toString())
-                    editAge.text.isEmpty() -> toastShow(editAge.hint.toString())
+                    logic.editName.text.isEmpty() -> showToast(logic.editName.hint.toString())
+                    logic.editLastName.text.isEmpty() -> showToast(logic.editLastName.hint.toString())
+                    logic.editAge.text.isEmpty() -> showToast(logic.editAge.hint.toString())
                     else -> {
-                        textView.text = ""
                         val line =
-                            "Имя = ${editName.text} Фамилия = ${editLastName.text}, Возраст = ${editAge.text}\n"
-                        lines.add(line)
-                        for (item in lines)
-                            textView.text = textView.text.toString() + item
+                            "Имя = ${logic.editName.text} Фамилия = ${logic.editLastName.text}, Возраст = ${logic.editAge.text}\n"
+                        logic.lines.add(line)
+                        logic.showLines(textView)
                     }
                 }
             }
         }
         buttonRemove.setOnClickListener {
-            if (lines.size == 0)
-                Snackbar.make(it, "Список пуст", Snackbar.LENGTH_SHORT).show()
+            if (logic.lines.size == 0)
+                showSnackbar(it, "Список пуст")
             else {
-                lines.removeLast()
-                textView.text = ""
-                for (item in lines)
-                    textView.text = textView.text.toString() + item
+                logic.lines.removeLast()
+                logic.showLines(textView)
             }
 
         }
